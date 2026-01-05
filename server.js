@@ -10,6 +10,14 @@ import express from 'express';
 
  import bcrypt from 'bcrypt';
 
+ //----Database Connectivity
+
+ import ConnectDb from './DB/ConnectionDb.js';
+
+ //------- UserRegs Import
+
+ import UserDataSchema from './DB/Models/UserRegs.js';
+
 
 
 const app = express();
@@ -30,6 +38,14 @@ app.post("/registration",async(req,res)=>{
 
   var hashpass = await bcrypt.hash(UserPass,salt)
 
+  if(!UserName|| !UserEmail|| !UserPass){
+
+   return res.send("All Field Need To Be Filled!!")
+
+  }
+
+
+
   var newUserData={
 
         UserName,
@@ -39,11 +55,37 @@ app.post("/registration",async(req,res)=>{
   }
 
 
+  await UserDataSchema.create(newUserData)
+
 return res.send("newUserData")
 
 
 })
 
+
+//----Api:localhost:5000/Login
+//----Method:Post
+//----Desc:Login User
+
+app.post("/login",async(req,res)=>{
+
+   const {UserEmail, UserPassword}= req.body;
+
+   if(!UserEmail|| !UserPassword){
+
+       return res.send("Kind Fill All The Feilds..")
+
+   }
+
+
+   var UserAvail = await UserDataSchema.findById();
+
+
+    return res.send(UserAvail)
+})
+
+
 app.listen(5000,()=>{
-    console.log("RUN ")
+    ConnectDb();
+    console.log("Server Is Running Succesfully")
 })
