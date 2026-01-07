@@ -63,25 +63,36 @@ return res.send("newUserData")
 })
 
 
-//----Api:localhost:5000/Login
+//----Api:localhost:5000/login
 //----Method:Post
 //----Desc:Login User
 
 app.post("/login",async(req,res)=>{
 
-   const {UserEmail, UserPassword}= req.body;
+   const {UserEmail, UserPass}= req.body;
 
-   if(!UserEmail|| !UserPassword){
+   if(!UserEmail|| !UserPass){
 
        return res.send("Kind Fill All The Feilds..")
 
    }
 
 
-   var UserAvail = await UserDataSchema.findById();
+   var UserAvail = await UserDataSchema.find({UserEmail});
+
+   var DB_PASS = UserAvail[0].UserPass;
+
+   var ValidOrNote = await bcrypt.compare(UserPass,DB_PASS);
+
+   if(!ValidOrNote){
+
+       return res.send("Something Went Wrong");
+
+   }
 
 
-    return res.send(UserAvail)
+
+    return res.send("Account Login Succcesfully!!!!")
 })
 
 
